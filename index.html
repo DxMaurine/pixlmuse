@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PixlMuse AI Image Generator</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
         :root {
             --bg-color: #f5f7fa;
@@ -610,6 +611,51 @@
             to { opacity: 1; transform: scale(1); }
         }
 
+       /* Update your existing modal and download button styles */
+        #imageModal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #modalImage {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+        }
+
+        #downloadBtn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background-color: #6a11cb;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: none;
+            z-index: 1002; /* Higher than modal's z-index */
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        #downloadBtn:hover {
+            background-color: #4d0d9c;
+            transform: scale(1.1);
+        }
+
 
     </style>
 </head>
@@ -763,9 +809,11 @@
             <div class="prompt" data-prompt="Portrait of a cybernetic woman, soft lighting, intricate details">Portrait of a cybernetic woman, soft lighting, intricate details</div>
             <div class="prompt" data-prompt="Surreal landscape with floating islands, vibrant colors, dreamlike">Surreal landscape with floating islands, vibrant colors, dreamlike</div>
         </div>
-
         <div id="gallery" class="gallery-grid"></div>
     </div>
+    
+
+ 
 
     <!-- Settings Modal -->
     <div id="settingsModal" class="modal">
@@ -926,25 +974,29 @@
         </div>
     </div>
     <!-- Modal Zoom Container -->
+    <!-- Modal Zoom Container -->
     <div id="imageModal">
     <img id="modalImage" src="" alt="Zoomed Image">
-    </div>
-
-
-    <footer style="background-color: transparent; color: #9CA3AF; padding: 1rem; text-align: center; font-size: 0.875rem;">
-    <div style="margin-bottom: 0.5rem;">
-    <div class="footer-links">
-    <a href="#" class="footer-link" onclick="showModal('terms')">Terms of Service</a>
-    <span class="separator">|</span>
-    <a href="#" class="footer-link" onclick="showModal('privacy')">Privacy Policy</a>
-    </div>
-    <div id="modal" style="display:none; position:fixed; top:0;left:0;width:100%;height:100%;background:#0008;z-index:1000;">
-  <div style="background:white; max-width:800px; margin:5% auto; padding:20px; border-radius:10px; position:relative;">
-    <button onclick="closeModal()" style="position:absolute;top:10px;right:15px;">✖</button>
-    <div id="modal-content" style="max-height:70vh; overflow-y:auto;"></div>
-  </div>
+    <button id="downloadBtn" title="Download Image">
+        <i class="fas fa-download"></i>
+    </button>
 </div>
+    
 
+        <!--foooter-->
+        <footer style="background-color: transparent; color: #9CA3AF; padding: 1rem; text-align: center; font-size: 0.875rem;">
+        <div style="margin-bottom: 0.5rem;">
+        <div class="footer-links">
+        <a href="#" class="footer-link" onclick="showModal('terms')">Terms of Service</a>
+        <span class="separator">|</span>
+        <a href="#" class="footer-link" onclick="showModal('privacy')">Privacy Policy</a>
+        </div>
+        <div id="modal" style="display:none; position:fixed; top:0;left:0;width:100%;height:100%;background:#0008;z-index:1000;">
+        <div style="background:white; max-width:800px; margin:5% auto; padding:20px; border-radius:10px; position:relative;">
+        <button onclick="closeModal()" style="position:absolute;top:10px;right:15px;">✖</button>
+        <div id="modal-content" style="max-height:70vh; overflow-y:auto;"></div>
+        </div>
+    </div>
   </div>
 </div>
 
@@ -967,6 +1019,7 @@
     const generateFromModal = document.getElementById('generateFromModal');
     const promptInput = document.getElementById('promptInput');
     const gallery = document.getElementById('gallery'); // ✅ sesuai ID HTML-mu
+    const downloadBtn = document.getElementById('downloadBtn');
 
     // 🌙 Theme Toggle
     let darkMode = localStorage.getItem('darkMode') === 'true';
@@ -1143,6 +1196,76 @@
                 document.body.style.overflow = 'auto';
             }
         });
+         
+        // Update your existing modal zoom code with this:
+
+        const downloadBtn = document.getElementById('downloadBtn');
+        let currentImageUrl = '';
+
+        // When clicking gallery images
+        document.getElementById('gallery').addEventListener('click', function (e) {
+        if (e.target.tagName === 'IMG') {
+        currentImageUrl = e.target.src;
+        modalImage.src = currentImageUrl;
+        imageModal.style.display = 'flex';
+        downloadBtn.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+            }
+        });
+
+        // Close modal
+        imageModal.addEventListener('click', function (e) {
+            if (e.target === imageModal || e.target === modalImage) {
+                imageModal.style.display = 'none';
+                downloadBtn.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        });
+
+           // Download functionality
+        downloadBtn.addEventListener('click', async function() {
+            if (!currentImageUrl) return;
+            
+            try {
+                // Show loading state
+                downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                
+                // Create filename with PixlMuse + date format
+                const now = new Date();
+                const dateStr = now.toISOString().split('T')[0]; // YYYY-MM-DD format
+                const timeStr = now.getHours() + '-' + now.getMinutes(); // HH-MM format
+                const filename = `PixlMuse_${dateStr}_${timeStr}.jpg`;
+                
+                // Fetch the image as blob
+                const response = await fetch(currentImageUrl);
+                if (!response.ok) throw new Error('Failed to download image');
+                
+                const blob = await response.blob();
+                const blobUrl = URL.createObjectURL(blob);
+                
+                // Create hidden download link
+                const a = document.createElement('a');
+                a.href = blobUrl;
+                a.download = filename;
+                a.style.display = 'none';
+                document.body.appendChild(a);
+                
+                // Trigger download
+                a.click();
+                
+                // Cleanup
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(blobUrl);
+                    downloadBtn.innerHTML = '<i class="fas fa-download"></i>';
+                }, 100);
+                
+            } catch (error) {
+                console.error('Download error:', error);
+                downloadBtn.innerHTML = '<i class="fas fa-download"></i>';
+                alert('Failed to download image. Please try again.');
+            }
+        }); 
 
         //term privacy
             function showModal(type) {
