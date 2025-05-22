@@ -1222,51 +1222,106 @@
             }
         });
 
-           // Download functionality
-        downloadBtn.addEventListener('click', async function() {
+        // Enhanced Download Functionality
+            downloadBtn.addEventListener('click', async function() {
             if (!currentImageUrl) return;
             
             try {
-                // Show loading state
+                // 1. Show loading state
+                const originalIcon = downloadBtn.innerHTML;
                 downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                downloadBtn.style.pointerEvents = 'none';
                 
-                // Create filename with PixlMuse + date format
+                // 2. Create beautiful filename
                 const now = new Date();
-                const dateStr = now.toISOString().split('T')[0]; // YYYY-MM-DD format
-                const timeStr = now.getHours() + '-' + now.getMinutes(); // HH-MM format
+                const pad = num => num.toString().padStart(2, '0');
+                const dateStr = [
+                    now.getFullYear(),
+                    pad(now.getMonth() + 1),
+                    pad(now.getDate())
+                ].join('-');
+                const timeStr = [
+                    pad(now.getHours()),
+                    pad(now.getMinutes()),
+                    pad(now.getSeconds())
+                ].join('-');
                 const filename = `PixlMuse_${dateStr}_${timeStr}.jpg`;
+        
+                // 3. Fetch with error handling
+                const response = await fetch(currentImageUrl, {
+                    cache: 'no-store',
+                    mode: 'cors'
+                });
                 
-                // Fetch the image as blob
-                const response = await fetch(currentImageUrl);
-                if (!response.ok) throw new Error('Failed to download image');
-                
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                if (!response.headers.get('content-type').includes('image')) {
+                    throw new Error('Downloaded file is not an image');
+                }
+        
+                // 4. Create and trigger download
                 const blob = await response.blob();
                 const blobUrl = URL.createObjectURL(blob);
                 
-                // Create hidden download link
                 const a = document.createElement('a');
                 a.href = blobUrl;
                 a.download = filename;
                 a.style.display = 'none';
                 document.body.appendChild(a);
-                
-                // Trigger download
                 a.click();
-                
-                // Cleanup
+        
+                // 5. Cleanup with delay
                 setTimeout(() => {
                     document.body.removeChild(a);
                     URL.revokeObjectURL(blobUrl);
-                    downloadBtn.innerHTML = '<i class="fas fa-download"></i>';
+                    downloadBtn.innerHTML = originalIcon;
+                    downloadBtn.style.pointerEvents = 'auto';
+                    
+                    // 6. Show brief confirmation
+                    const confirmation = document.createElement('div');
+                    confirmation.textContent = '✓ Downloaded!';
+                    confirmation.style.position = 'fixed';
+                    confirmation.style.bottom = '80px';
+                    confirmation.style.right = '30px';
+                    confirmation.style.backgroundColor = '#4CAF50';
+                    confirmation.style.color = 'white';
+                    confirmation.style.padding = '8px 16px';
+                    confirmation.style.borderRadius = '4px';
+                    confirmation.style.zIndex = '1003';
+                    document.body.appendChild(confirmation);
+                    
+                    setTimeout(() => {
+                        document.body.removeChild(confirmation);
+                    }, 2000);
                 }, 100);
-                
+        
             } catch (error) {
                 console.error('Download error:', error);
                 downloadBtn.innerHTML = '<i class="fas fa-download"></i>';
-                alert('Failed to download image. Please try again.');
+                downloadBtn.style.pointerEvents = 'auto';
+                
+                // Show error message
+                const errorMsg = document.createElement('div');
+                errorMsg.textContent = '⚠ Download failed';
+                errorMsg.style.position = 'fixed';
+                errorMsg.style.bottom = '80px';
+                errorMsg.style.right = '30px';
+                errorMsg.style.backgroundColor = '#f44336';
+                errorMsg.style.color = 'white';
+                errorMsg.style.padding = '8px 16px';
+                errorMsg.style.borderRadius = '4px';
+                errorMsg.style.zIndex = '1003';
+                document.body.appendChild(errorMsg);
+                
+                setTimeout(() => {
+                    document.body.removeChild(errorMsg);
+                }, 2000);
             }
-        }); 
+        });
 
+
+
+    
+        
         //term privacy
             function showModal(type) {
             const fileMap = {
