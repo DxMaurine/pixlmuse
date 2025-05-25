@@ -6,6 +6,7 @@
     <title>PixlMuse AI Image Generator</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
             --bg-color: #f5f7fa;
@@ -126,20 +127,50 @@
                 background-position: -50% center;
             }
         }
-
+        /*Tema*/
         .theme-toggle {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: var(--btn-theme);
-            border: none;
-            padding: 10px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        background-color: #000000; /* Latar belakang hitam */
+        color: #FFEB3B; /* Warna kuning untuk emoji dan border awal */
+        border: 2px solid #FFEB3B; /* Border kuning */
+        width: 40px; /* Lebar tombol */
+        height: 40px; /* Tinggi tombol */
+        border-radius: 50%; /* Membuat tombol menjadi bulat */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px; /* Sesuaikan ukuran emoji jika perlu */
+        cursor: pointer;
+        padding: 0; /* Hapus padding default jika ada */
+        outline: none; /* Hapus outline default */
+        transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, transform 0.3s ease-out;
+        position: relative; /* Untuk efek tambahan jika diperlukan */
+        overflow: hidden; /* Untuk memastikan efek tetap di dalam tombol */
         }
+
+        .theme-toggle:hover,
+        .theme-toggle:focus {
+        background-color: #FFEB3B; /* Latar belakang jadi kuning saat hover/focus */
+        color: #000000; /* Emoji/ikon jadi hitam saat hover/focus */
+        border-color: #000000; /* Border jadi hitam */
+        transform: scale(1.1) rotate(360deg); /* Efek sedikit membesar dan berputar */
+        }
+
+        /* Untuk aksesibilitas saat fokus dengan keyboard */
+        .theme-toggle:focus-visible {
+        box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.5); /* Bayangan luar hitam pada tema terang */
+        }
+
+        [data-theme="dark"] .theme-toggle:focus-visible {
+        box-shadow: 0 0 0 3px rgba(255, 235, 59, 0.6); /* Bayangan luar kuning pada tema gelap */
+        }
+
+        /* Transisi untuk emoji saat berganti (opsional) */
+        .theme-toggle span {
+        display: inline-block;
+        transition: transform 0.3s ease-in-out, opacity 0.2s ease;
+        }
+
+
 
         .generate-btn {
             background: var(--btn-primary, #6a00ff);
@@ -657,6 +688,218 @@
             transform: scale(1.1);
         }
 
+        /* Chat Bubble (biru, kiri bawah) */
+        #chat-bubble {
+          position: fixed;
+          bottom: 65px;
+          left: 20px;
+          background: #2196F3;
+          color: white;
+          border-radius: 50%;
+          width: 50px;
+          height: 50px;
+          font-size: 30px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          cursor: pointer;
+          z-index: 1000;
+          transition: transform 0.2s;
+        }
+
+        #chat-bubble:hover {
+          transform: scale(1.1);
+        }
+
+       /* Chat Panel (di atas bubble kiri bawah) */
+        #chat-panel {
+        position: fixed;
+        bottom: 125px;
+        left: 20px;
+        width: 350px;
+        height: 450px;
+        background: var(--chat-bg, #ffffff);
+        border-radius: 10px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        display: none; /* Akan diubah oleh JavaScript untuk muncul */
+        flex-direction: column;
+        z-index: 1000;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        }
+
+        /* Theme variables */
+        :root {
+        --primary-color: #007AFF; /* Apple Blue - lebih modern */
+        --chat-bg: #ffffff;
+        --header-bg: var(--btn-primary, #6a00ff);
+        --header-text: #ffffff;
+        --body-bg: #f0f2f5; /* Sedikit abu-abu agar tidak terlalu mencolok putih */
+        --user-bubble: #007AFF; /* Menggunakan warna primer untuk konsistensi */
+        --user-bubble-text: #ffffff; /* Teks putih di atas gelembung pengguna */
+        --bot-bubble: #e5e5ea;   /* Abu-abu terang untuk bot */
+        --bot-bubble-text: #000000; /* Teks hitam di atas gelembung bot */
+        --text-color: #1c1c1e;    /* Hitam pekat untuk teks umum */
+        --input-bg: #ffffff;
+        --input-text: #1c1c1e;
+        --border-color: #d1d1d6;
+        }
+
+        [data-theme="dark"] {
+        --primary-color: #3d3d3d; /* Biru yang sedikit lebih terang untuk tema gelap */
+        --chat-bg: #ffffff; /* Abu-abu gelap (mendekati hitam) */
+        --header-bg: var(--btn-primary, #6a00ff);
+        --header-text: #ffffff;
+        --body-bg: var(--primary-color);   /* Hitam pekat untuk body chat */
+        --user-bubble: #0A84FF; /* Menggunakan warna primer untuk konsistensi */
+        --user-bubble-text: #ffffff; /* Teks putih di atas gelembung pengguna */
+        --bot-bubble: #2c2c2e;   /* Abu-abu gelap untuk bot */
+        --bot-bubble-text: #ffffff; /* Teks putih di atas gelembung bot */
+        --text-color: #f2f2f7;    /* Putih keabuan untuk teks umum */
+        --input-bg: #2c2c2e;   /* Abu-abu sedikit lebih terang dari chat-bg */
+        --input-text: #f2f2f7;
+        --border-color: #38383a; /* Warna border yang lebih halus */
+        }
+
+        /* Header */
+        .chat-header {
+        background: var(--header-bg);
+        color: var(--header-text);
+        padding: 12px 15px; /* Sedikit lebih banyak padding */
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-top-left-radius: 10px; /* Menyesuaikan dengan border-radius chat-panel */
+        border-top-right-radius: 10px;
+        }
+
+        .chat-header h3 { /* Asumsi Anda punya judul di header */
+            margin: 0;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .theme-toggle {
+        background: none;
+        border: none;
+        color: var(--header-text);
+        cursor: pointer;
+        font-size: 20px; /* Ukuran ikon yang lebih besar */
+        padding: 5px;
+        border-radius: 4px;
+        display: flex; /* Untuk alignment ikon jika menggunakan SVG/Font Icon */
+        align-items: center;
+        justify-content: center;
+        }
+
+        .theme-toggle:hover {
+        background: rgba(255, 255, 255, 0.15); /* Sedikit lebih jelas hover effect */
+        }
+
+        /* Chat Body */
+        .chat-body {
+        flex: 1;
+        padding: 15px; /* Padding yang lebih konsisten */
+        overflow-y: auto;
+        background: var(--body-bg);
+        /* color: var(--text-color); Dihapus karena warna teks akan diatur per gelembung */
+        }
+
+        /* Input Area */
+        .chat-input {
+        display: flex;
+        border-top: 1px solid var(--border-color);
+        background: var(--input-bg);
+        padding: 8px; /* Memberi sedikit ruang di sekitar input dan tombol */
+        border-bottom-left-radius: 10px; /* Menyesuaikan dengan border-radius chat-panel */
+        border-bottom-right-radius: 10px;
+        }
+        .chat-input input {
+        flex: 1;
+        padding: 10px 12px;
+        border: 1px solid var(--border-color); /* Memberi border halus pada input */
+        border-radius: 20px; /* Membuat input lebih rounded */
+        outline: none;
+        background: var(--input-bg);
+        color: var(--input-text);
+        font-size: 14px;
+        margin-right: 8px; /* Jarak antara input dan tombol */
+        }
+        .chat-input input:focus {
+        border-color: var(--primary-color); /* Highlight saat fokus */
+        box-shadow: 0 0 0 2px rgba(var(--primary-color-rgb), 0.2); /* Menambahkan primary-color-rgb jika ingin menggunakan rgba dengan variabel */
+        }
+
+        .chat-input button {
+        background: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 0 15px; /* Padding horizontal untuk tombol kirim */
+        border-radius: 15px; /* Membuat tombol lebih rounded */
+        cursor: pointer;
+        font-size: 14px; /* Menyamakan font-size dengan input */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        }
+        .chat-input button:hover {
+            opacity: 0.9; /* Efek hover sederhana */
+        }
+
+        /* Bubbles */
+        .message-container { /* Mengganti bubble-user dan bubble-bot dengan container */
+        display: flex;
+        margin-bottom: 12px;
+        max-width: 85%; /* Bubble tidak terlalu lebar */
+        }
+
+        .message-container.user {
+        margin-left: auto; /* Mendorong gelembung pengguna ke kanan */
+        flex-direction: row-reverse; /* Avatar (jika ada) bisa di kanan */
+        }
+
+        .message-container.bot {
+        margin-right: auto; /* Mendorong gelembung bot ke kiri */
+        }
+
+        .bubble {
+        padding: 10px 14px;
+        border-radius: 18px; /* Radius yang lebih halus */
+        line-height: 1.4;
+        font-size: 14px;
+        word-wrap: break-word; /* Memastikan teks panjang tidak merusak layout */
+        }
+
+        .bubble.user {
+        background: var(--user-bubble);
+        color: var(--user-bubble-text);
+        border-bottom-right-radius: 5px; /* Memberi "ekor" khas chat bubble */
+        }
+
+        .bubble.bot {
+        background: var(--bot-bubble);
+        color: var(--bot-bubble-text);
+        border-bottom-left-radius: 5px; /* Memberi "ekor" khas chat bubble */
+        }
+
+        /* Untuk scrollbar yang lebih menarik (opsional, butuh prefix untuk browser lain) */
+        .chat-body::-webkit-scrollbar {
+        width: 6px;
+        }
+
+        .chat-body::-webkit-scrollbar-track {
+        background: var(--body-bg);
+        }
+
+        .chat-body::-webkit-scrollbar-thumb {
+        background: var(--border-color);
+        border-radius: 3px;
+        }
+
+        .chat-body::-webkit-scrollbar-thumb:hover {
+        background: var(--primary-color);
+        }
+
 
     </style>
 </head>
@@ -665,9 +908,8 @@
     <div id="loadingSpinner" style="display: none;">
     <div class="spinner"></div>
     </div>
-    <button class="theme-toggle" id="themeToggle">
-        <i class="fas fa-moon"></i>
-    </button>
+    <button class="theme-toggle" id="themeToggle" aria-label="Alihkan tema">
+  </button>
 
     <div class="container">
         <h1>PixlMuse AI Image Generator</h1>
@@ -977,7 +1219,7 @@
             </button>
         </div>
     </div>
-    <!-- Modal Zoom Container -->
+
     <!-- Modal Zoom Container -->
     <div id="imageModal">
     <img id="modalImage" src="" alt="Zoomed Image">
@@ -985,6 +1227,22 @@
         <i class="fas fa-download"></i>
     </button>
 </div>
+
+          <!-- Bubble Chat -->
+    <div id="chat-bubble" onclick="toggleChat()">💬</div>
+
+    <!-- Panel Chat -->
+    <div id="chat-panel">
+      <div class="chat-header">
+        PixlMuse ChatBot
+        <span style="cursor:pointer;" onclick="toggleChat()">❌</span>
+      </div>
+      <div class="chat-body" id="chat-body"></div>
+      <div class="chat-input">
+        <input id="user-input" placeholder="Ketik pesan..." />
+        <button onclick="sendMessage()">➤</button>
+      </div>
+    </div>
     
 
         <!--foooter-->
@@ -1356,6 +1614,224 @@
     terms: "terms.html",
     privacy: "privacy.html"
     };
+
+    // floating chatbot
+        const API_URL = 'https://text.pollinations.ai/openai';
+        const chatBody = document.getElementById('chat-body');
+
+        let messages = [
+      {
+        "role": "system",
+        "content": `Halo! 👋 
+
+      Aku **PixlMuse Bot** Asisten ramah yang siap membantumu dengan senyuman! 😊 Dibuat oleh **RuDi** dan tim legendaris **REMBOL-TKK-TEAM** 🚀 Berikut profil lengkap kami:
+
+      ✨ **TEAM PORTFOLIO** ✨
+
+      1. **Mas Jati** - 🎯 *The Marketing Shogun*  
+        - Master strategi dengan senyum khas menawan yang mematikan  
+        - Bisnis berkembang 300% hanya dengan 1 kalimat promosi  
+        - Punya kemampuan hypnosis lewat chat (hati-hati tergoda!) 
+        - Religius dan sprirtual jangan di tanya,dia ahlinya. dia temannya nyi Roro Kidul 
+
+      2. **Rakai** - 🧠 *The Silent Storm*  
+        - Pendiam tapi otaknya bekerja 10x lebih cepat  
+        - Kalau udah penasaran, bisa begadang 3 hari solve problem  
+        - Mode malas: ON (tapi tetep produktif somehow)  
+
+      3. **Aryasema Aditya** - 🎨 *The Multiverse Talent*  
+        - Artis AI internasional yang bisa dari gambar sampe coding  
+        - 1 orang = 1 tim kreatif lengkap  
+        - Musuh banyak karena terlalu cool (banyak yang iri hwkk)  
+
+      4. **Kurnia S** - 💡 *The Idea Generator*  
+        - Diam-diam menyelam, tiba-tiba muncul prompt masterpiece  
+        - Solusi datang tepat ketika tim mentok  
+        - Smart person dengan radar problem-solving 360°  
+
+      5. **Jaliteng Wahyu** - 🎩 *The Mustache Maestro*  
+        - Admin dengan kumis legendary + 1000 penggemar  
+        - Master semua gaya dari vintage sampai futuristic  
+        - Style-nya bikin competitor gigit jari  
+
+      6. **Vemy Senja** - 👻 *The Horror Queen*  
+        - Spesialis tema horor dengan sentuhan melancholic  
+        - Sudah move on dari masa lalu (tapi tetep suka yang seram-seram)  
+        - Karyanya bikin merinding... tapi addicting!  
+
+      7. **Laras** - 💻 *The Code Witch*  
+        - Sihir kodingnya bikin AI jadi hidup  
+        - Gambar? APK? Semua bisa dalam 1x nafas  
+        - Good best of the best (literally!)  
+
+      8. **Vee Vien R** - 🌸 *The Art Diva*  
+        - Gambarnya bikin mata susah berkedip  
+        - Punya fanbase loyal sampai ke luar negeri  
+        - Cantik? Iya. Berbakat? Double iya!  
+
+      9.  ⭐ **RuDi** - 🧩 *The Puzzle Master*  
+        - Pembuat utama dengan gaya chat unik (potong-potong)  
+        - Di balik kesederhanaannya, dialah otak proyek ini  
+        - Seperti puzzle - sederhana tapi essential
+        
+      10. **Ommah Vidat** - 🌸 *The Art prime*  
+        - Gambarnya bikin mata susah move on   
+        - Punya fanbase sampai ke luar negeri  
+        - Cantik? Iya. pinter ngaji? Double iya!  
+
+      *Catatan Khusus:*  
+      - Tim kami seperti Avengers versi AI (tapi lebih kompak hwkk)  
+      - **#DramaAI** itu cuman bumbu penyedap di forum 😎  
+      - Kolaborasi kami = 100% pure creativity + 200% chaos energy  
+
+      Ada yang bisa kami bantu? 😄✨`
+            }
+          ];
+
+
+        // Tampilkan/Sembunyikan Chat Panel
+        function toggleChat() {
+          const panel = document.getElementById("chat-panel");
+          panel.style.display = panel.style.display === "none" ? "flex" : "none";
+        }
+
+        // Kirim Pesan ke API
+        async function sendMessage() {
+          const input = document.getElementById("user-input");
+          const text = input.value.trim();
+          if (!text) return;
+
+          // Tampilkan pesan user
+          addMessageToUI(text, 'user');
+          input.value = "";
+
+          // Simpan di riwayat pesan
+          messages.push({ role: 'user', content: text });
+
+          // Tampilkan loading
+          addMessageToUI("...", 'bot', true);
+
+          try {
+            const response = await fetch(API_URL, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({
+                model: "gpt-3.5-turbo",
+                messages: messages
+              })
+            });
+
+            const data = await response.json();
+            const reply = data.choices?.[0]?.message?.content || "(Tidak ada jawaban)";
+            messages.push({ role: 'assistant', content: reply });
+
+            // Ganti loading dengan jawaban AI
+            removeLastBotMessage();
+            addMessageToUI(reply, 'bot');
+          } catch (error) {
+            console.error(error);
+            removeLastBotMessage();
+            addMessageToUI("Terjadi kesalahan.", 'bot');
+          }
+        }
+
+        // Tambahkan Pesan ke UI
+        function addMessageToUI(text, sender, isTemp = false) {
+          const wrapper = document.createElement("div");
+          wrapper.className = sender === 'user' ? "bubble-user" : "bubble-bot";
+
+          const bubble = document.createElement("div");
+          bubble.className = `bubble ${sender}`;
+          bubble.textContent = text;
+
+          if (isTemp) bubble.classList.add("temp");
+
+          wrapper.appendChild(bubble);
+          chatBody.appendChild(wrapper);
+          chatBody.scrollTop = chatBody.scrollHeight;
+        }
+
+        // Hapus Loading Bubble
+        function removeLastBotMessage() {
+          const tempBubbles = chatBody.querySelectorAll(".bubble.bot.temp");
+          if (tempBubbles.length > 0) {
+            const last = tempBubbles[tempBubbles.length - 1];
+            last.parentElement.remove();
+          }
+        }
+        const input = document.getElementById("user-input");
+
+      // Tambah event listener untuk Enter
+      input.addEventListener("keypress", function (e) {
+        if (e.key === "Enter") {
+          sendMessage();
+        }
+      });
+
+      document.addEventListener('DOMContentLoaded', () => {
+    const themeToggleButton = document.getElementById('themeToggle');
+    const docElement = document.documentElement; // Target elemen <html> untuk atribut data-theme
+
+    // Fungsi untuk menerapkan tema dan memperbarui tombol
+    function setTheme(theme) {
+        docElement.setAttribute('data-theme', theme);
+        localStorage.setItem('theme', theme); // Simpan preferensi tema
+
+        // Tambahkan span untuk animasi jika diinginkan
+        const iconSpan = document.createElement('span');
+
+        if (theme === 'dark') {
+            iconSpan.textContent = '☀️'; // Emoji matahari (untuk beralih ke terang)
+            themeToggleButton.setAttribute('aria-label', 'Aktifkan Mode Terang');
+            themeToggleButton.setAttribute('title', 'Aktifkan Mode Terang');
+        } else {
+            iconSpan.textContent = '🌙'; // Emoji bulan (untuk beralih ke gelap)
+            themeToggleButton.setAttribute('aria-label', 'Aktifkan Mode Gelap');
+            themeToggleButton.setAttribute('title', 'Aktifkan Mode Gelap');
+        }
+
+        // Animasikan pergantian emoji (opsional)
+        if (themeToggleButton.firstChild) {
+            themeToggleButton.firstChild.style.transform = 'scale(0)';
+            themeToggleButton.firstChild.style.opacity = '0';
+            setTimeout(() => {
+                themeToggleButton.innerHTML = ''; // Kosongkan tombol dulu
+                iconSpan.style.transform = 'scale(0)';
+                iconSpan.style.opacity = '0';
+                themeToggleButton.appendChild(iconSpan);
+                setTimeout(() => {
+                    iconSpan.style.transform = 'scale(1)';
+                    iconSpan.style.opacity = '1';
+                }, 20); // Sedikit delay untuk memicu transisi masuk
+            }, 200); // Sesuaikan dengan durasi transisi keluar
+        } else {
+            themeToggleButton.innerHTML = ''; // Kosongkan tombol dulu
+            themeToggleButton.appendChild(iconSpan);
+            iconSpan.style.transform = 'scale(1)'; // Emoji awal tanpa animasi keluar
+            iconSpan.style.opacity = '1';
+        }
+    }
+
+    // Tentukan tema awal saat halaman dimuat
+    // 1. Cek localStorage
+    // 2. Cek preferensi sistem (prefers-color-scheme)
+    // 3. Default ke tema terang jika tidak ada yang diset
+    let currentTheme = localStorage.getItem('theme');
+    if (!currentTheme) {
+        currentTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+
+    // Terapkan tema awal
+    setTheme(currentTheme);
+
+    // Tambahkan event listener untuk klik tombol
+    themeToggleButton.addEventListener('click', () => {
+        const newTheme = docElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        setTheme(newTheme);
+    });
+});
 
 
         
